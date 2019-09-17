@@ -1,13 +1,13 @@
---- libimagequant-2.12.1/Makefile.orig	2018-06-03 21:46:28.000000000 +0200
-+++ libimagequant-2.12.1/Makefile	2018-07-21 18:56:53.497142471 +0200
+--- libimagequant-2.12.5/Makefile.orig	2019-07-27 14:50:23.000000000 +0200
++++ libimagequant-2.12.5/Makefile	2019-09-17 17:00:18.143888507 +0200
 @@ -64,8 +64,8 @@
  
  $(OBJS): $(wildcard *.h) config.mk
  
 -$(JNILIB): $(JAVAHEADERS) $(STATICLIB) org/pngquant/PngQuant.c
--	$(CC) -g $(CFLAGS) $(LDFLAGS) $(JAVAINCLUDE) -shared -o $@ $(STATICLIB) org/pngquant/PngQuant.c
+-	$(CC) -g $(CFLAGS) $(LDFLAGS) $(JAVAINCLUDE) -shared -o $@ org/pngquant/PngQuant.c $(STATICLIB)
 +$(JNILIB): $(JAVAHEADERS) $(SHAREDLIB) org/pngquant/PngQuant.c
-+	$(CC) -g $(CFLAGS) $(LDFLAGS) $(JAVAINCLUDE) -shared -o $@ $(SHAREDLIB) org/pngquant/PngQuant.c
++	$(CC) -g $(CFLAGS) $(LDFLAGS) $(JAVAINCLUDE) -shared -o $@ org/pngquant/PngQuant.c $(SHAREDLIB)
  
  $(JNIDLL) $(JNIDLLIMP): $(JAVAHEADERS) $(OBJS) org/pngquant/PngQuant.c
  	$(CC) -fPIC -shared -I. $(JAVAINCLUDE) -o $(JNIDLL) $^ $(LDFLAGS) -Wl,--out-implib,$(JNIDLLIMP),--output-def,$(JNIDLLDEF)
