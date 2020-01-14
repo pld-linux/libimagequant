@@ -14,14 +14,14 @@
 Summary:	Image Quantization library
 Summary(pl.UTF-8):	Biblioteka do kwantyzacji obrazów
 Name:		libimagequant
-Version:	2.12.5
+Version:	2.12.6
 Release:	1
 # some original code was on MIT-like license
 License:	GPL v3+ with MIT parts or commercial
 Group:		Libraries
 #Source0Download: https://github.com/ImageOptim/libimagequant/releases
 Source0:	https://github.com/ImageOptim/libimagequant/archive/%{version}/%{name}-%{version}.tar.gz
-# Source0-md5:	de703ea6cd650c332f1ba2a23b234294
+# Source0-md5:	ea4574e797ac8a28e21c0c61a100bb4f
 Patch0:		%{name}-shared.patch
 URL:		https://pngquant.org/lib/
 %{?with_openmp:BuildRequires:	gcc >= 6:4.2}
