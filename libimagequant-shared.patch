@@ -1,6 +1,6 @@
---- libimagequant-2.12.5/Makefile.orig	2019-07-27 14:50:23.000000000 +0200
-+++ libimagequant-2.12.5/Makefile	2019-09-17 17:00:18.143888507 +0200
-@@ -64,8 +64,8 @@
+--- libimagequant-2.17.0/Makefile.orig	2021-11-15 00:57:01.000000000 +0100
++++ libimagequant-2.17.0/Makefile	2022-03-16 21:05:11.342090757 +0100
+@@ -64,8 +64,8 @@ libimagequant.dylib: $(SHAREDOBJS)
  
  $(OBJS): $(wildcard *.h) config.mk
  
@@ -11,22 +11,22 @@
  
  $(JNIDLL) $(JNIDLLIMP): $(JAVAHEADERS) $(OBJS) org/pngquant/PngQuant.c
  	$(CC) -fPIC -shared -I. $(JAVAINCLUDE) -o $(JNIDLL) $^ $(LDFLAGS) -Wl,--out-implib,$(JNIDLLIMP),--output-def,$(JNIDLLDEF)
-@@ -133,7 +133,7 @@
+@@ -134,7 +134,7 @@ ifeq ($(filter %clean %distclean, $(MAKE
  endif
  
  $(PKGCONFIG): config.mk
--	sed 's|PREFIX|$(PREFIX)|;s|VERSION|$(VERSION)|' < imagequant.pc.in > $(PKGCONFIG)
-+	sed 's|PREFIX|$(PREFIX)|;s|LIBDIR|$(LIBDIR)|;s|VERSION|$(VERSION)|' < imagequant.pc.in > $(PKGCONFIG)
+-	sed 's|@PREFIX@|$(PREFIX)|;s|@VERSION@|$(VERSION)|' < imagequant.pc.in > $(PKGCONFIG)
++	sed 's|@PREFIX@|$(PREFIX)|;s|@LIBDIR@|$(LIBDIR)|;s|@VERSION@|$(VERSION)|' < imagequant.pc.in > $(PKGCONFIG)
  
  .PHONY: all static shared clean dist distclean dll java cargo
  .DELETE_ON_ERROR:
---- libimagequant-2.12.1/imagequant.pc.in.orig	2018-06-03 21:46:28.000000000 +0200
-+++ libimagequant-2.12.1/imagequant.pc.in	2018-07-21 18:57:30.940475377 +0200
+--- libimagequant-2.17.0/imagequant.pc.in.orig	2022-03-16 21:03:51.702522202 +0100
++++ libimagequant-2.17.0/imagequant.pc.in	2022-03-16 21:05:58.435168965 +0100
 @@ -1,6 +1,6 @@
- prefix=PREFIX
+ prefix=@PREFIX@
  includedir=${prefix}/include
 -libdir=${prefix}/lib
-+libdir=LIBDIR
++libdir=@LIBDIR@
  
  Name: imagequant
  Description: Small, portable C library for high-quality conversion of RGBA images to 8-bit indexed-color (palette) images.
