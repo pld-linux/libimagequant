@@ -1,10 +1,9 @@
 # TODO:
 # - finish java (create .jar, install)
-# - build C#, rust bindings
+# - build C# bindings, rust crates
 #
 # Conditional build:
 %bcond_without	static_libs	# static library
-%bcond_without	openmp		# OpenMP support
 %bcond_with	sse		# SSE instructions
 %bcond_with	java		# Java bindings [TODO: finish]
 #
@@ -14,20 +13,23 @@
 Summary:	Image Quantization library
 Summary(pl.UTF-8):	Biblioteka do kwantyzacji obrazów
 Name:		libimagequant
-# note: versions >= 4 are rewritten in rust, prepared on DEVEL-rust branch
-Version:	2.18.0
+Version:	4.3.0
 Release:	1
 # some original code was on MIT-like license
 License:	GPL v3+ with MIT parts or commercial
 Group:		Libraries
 #Source0Download: https://github.com/ImageOptim/libimagequant/tags
 Source0:	https://github.com/ImageOptim/libimagequant/archive/%{version}/%{name}-%{version}.tar.gz
-# Source0-md5:	bc0870e98d02fef68f65ef770d0d5c30
-Patch0:		%{name}-shared.patch
+# Source0-md5:	c5290deecd9a1a7d115a823435dbd0a2
+Source1:	%{name}-%{version}-vendor.tar.xz
+# Source1-md5:	1e5c3a19b4c5099e151eb4fcfed4e96b
 URL:		https://pngquant.org/lib/
-%{?with_openmp:BuildRequires:	gcc >= 6:4.2}
+BuildRequires:	cargo
+BuildRequires:	cargo-c
 %{?with_java:BuildRequires:	jdk}
-%{?with_openmp:BuildRequires:	libgomp-devel}
+BuildRequires:	rpmbuild(macros) >= 2.012
+BuildRequires:	rust >= 1.70
+ExclusiveArch:	%{x8664} %{ix86} x32 aarch64 armv6hl armv7hl armv7hnl
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
@@ -63,36 +65,37 @@ Static libimagequant library.
 Statyczna biblioteka libimagequant.
 
 %prep
-%setup -q
-%patch0 -p1
+%setup -q -b1
+
+export CARGO_HOME="$(pwd)/.cargo"
+
+mkdir -p "$CARGO_HOME"
+cat >.cargo/config <<EOF
+[source.crates-io]
+replace-with = 'vendored-sources'
+
+[source.vendored-sources]
+directory = '$PWD/vendor'
+EOF
 
 %build
-# not autoconf configure
-./configure \
-	CC="%{__cc}" \
-	CFLAGS="%{rpmcflags} %{rpmcppflags}" \
-	LDFLAGS="%{rpmldflags}" \
-	--prefix=%{_prefix} \
-	--libdir=%{_libdir} \
-	%{__enable_disable sse} \
-	%{?with_openmp:--with-openmp}
+export CARGO_HOME="$(pwd)/.cargo"
 
-%{__make} shared %{?with_static_libs:static}
-
-%if %{with java}
-%{__make} java \
-	CLASSPATH=.
-%endif
+cd imagequant-sys
+cargo -v cbuild --offline --release --target %{rust_target} \
+        --prefix %{_prefix} \
+        --libdir %{_libdir}
 
 %install
 rm -rf $RPM_BUILD_ROOT
+export CARGO_HOME="$(pwd)/.cargo"
 
-%{__make} install \
-	DESTDIR=$RPM_BUILD_ROOT
-
-%if %{with static_libs}
-cp -p libimagequant.a $RPM_BUILD_ROOT%{_libdir}
-%endif
+cd imagequant-sys
+cargo -v cinstall --frozen --release --target %{rust_target} \
+	--destdir $RPM_BUILD_ROOT \
+	--prefix %{_prefix} \
+	--includedir %{_includedir} \
+	--libdir %{_libdir}
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -103,7 +106,8 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(644,root,root,755)
 %doc CHANGELOG COPYRIGHT README.md
-%attr(755,root,root) %{_libdir}/libimagequant.so.0
+%attr(755,root,root) %{_libdir}/libimagequant.so.*.*.*
+%attr(755,root,root) %ghost %{_libdir}/libimagequant.so.0.4
 
 %files devel
 %defattr(644,root,root,755)
