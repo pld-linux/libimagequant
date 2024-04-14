@@ -14,6 +14,7 @@
 Summary:	Image Quantization library
 Summary(pl.UTF-8):	Biblioteka do kwantyzacji obrazów
 Name:		libimagequant
+# note: versions >= 4 are rewritten in rust, prepared on DEVEL-rust branch
 Version:	2.18.0
 Release:	1
 # some original code was on MIT-like license
